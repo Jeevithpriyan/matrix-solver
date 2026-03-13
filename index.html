@@ -1,55 +1,360 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Matrix Solver</title>
+<title>Advanced Matrix Solver</title>
+
 <style>
+
 body{
-font-family:Arial;
+font-family: Arial;
+background:#f2f2f2;
 text-align:center;
-background:#eef;
+}
+
+h1{
+color:#333;
+}
+
+.container{
+margin-top:20px;
 }
 
 input{
 width:50px;
-margin:5px;
+height:30px;
+text-align:center;
+margin:2px;
 }
 
 button{
 padding:10px;
-margin-top:10px;
+margin:5px;
+cursor:pointer;
 }
+
+.matrix{
+margin:10px;
+display:inline-block;
+}
+
+#result{
+margin-top:20px;
+font-size:18px;
+font-weight:bold;
+}
+
 </style>
 </head>
 
 <body>
 
-<h1>Matrix Determinant Solver</h1>
+<h1>Matrix Solver</h1>
 
-<input id="a11">
-<input id="a12"><br>
+Enter Matrix Size (n × n)
 
-<input id="a21">
-<input id="a22"><br>
+<br><br>
 
-<button onclick="solve()">Solve</button>
+<input type="number" id="size" value="2" min="1" max="10">
 
-<h2 id="result"></h2>
+<button onclick="createMatrix()">Create Matrix</button>
+
+<div class="container">
+
+<div id="matrixA" class="matrix"></div>
+<div id="matrixB" class="matrix"></div>
+
+</div>
+
+<br>
+
+<button onclick="add()">A + B</button>
+<button onclick="subtract()">A - B</button>
+<button onclick="multiply()">A × B</button>
+<button onclick="transpose()">Transpose A</button>
+<button onclick="determinant()">Determinant A</button>
+<button onclick="inverse()">Inverse A</button>
+
+<div id="result"></div>
 
 <script>
 
-function solve(){
+function createMatrix(){
 
-let a11 = Number(document.getElementById("a11").value);
-let a12 = Number(document.getElementById("a12").value);
-let a21 = Number(document.getElementById("a21").value);
-let a22 = Number(document.getElementById("a22").value);
+let n = document.getElementById("size").value
 
-let det = a11*a22 - a12*a21;
+let A=""
+let B=""
 
-document.getElementById("result").innerHTML =
-"Determinant = " + det;
+for(let i=0;i<n;i++){
+
+for(let j=0;j<n;j++){
+
+A += `<input id="a${i}${j}" value="0">`
+B += `<input id="b${i}${j}" value="0">`
 
 }
+
+A+="<br>"
+B+="<br>"
+
+}
+
+document.getElementById("matrixA").innerHTML="<h3>Matrix A</h3>"+A
+document.getElementById("matrixB").innerHTML="<h3>Matrix B</h3>"+B
+
+}
+
+function getMatrix(prefix){
+
+let n = document.getElementById("size").value
+
+let m=[]
+
+for(let i=0;i<n;i++){
+
+m[i]=[]
+
+for(let j=0;j<n;j++){
+
+m[i][j]=Number(document.getElementById(prefix+i+j).value)
+
+}
+
+}
+
+return m
+
+}
+
+function showMatrix(m){
+
+let text=""
+
+for(let i=0;i<m.length;i++){
+
+for(let j=0;j<m.length;j++){
+
+text+=m[i][j].toFixed(2)+" "
+
+}
+
+text+="<br>"
+
+}
+
+document.getElementById("result").innerHTML=text
+
+}
+
+function add(){
+
+let A=getMatrix("a")
+let B=getMatrix("b")
+
+let n=A.length
+
+let C=[]
+
+for(let i=0;i<n;i++){
+
+C[i]=[]
+
+for(let j=0;j<n;j++){
+
+C[i][j]=A[i][j]+B[i][j]
+
+}
+
+}
+
+showMatrix(C)
+
+}
+
+function subtract(){
+
+let A=getMatrix("a")
+let B=getMatrix("b")
+
+let n=A.length
+
+let C=[]
+
+for(let i=0;i<n;i++){
+
+C[i]=[]
+
+for(let j=0;j<n;j++){
+
+C[i][j]=A[i][j]-B[i][j]
+
+}
+
+}
+
+showMatrix(C)
+
+}
+
+function multiply(){
+
+let A=getMatrix("a")
+let B=getMatrix("b")
+
+let n=A.length
+
+let C=[]
+
+for(let i=0;i<n;i++){
+
+C[i]=[]
+
+for(let j=0;j<n;j++){
+
+C[i][j]=0
+
+for(let k=0;k<n;k++){
+
+C[i][j]+=A[i][k]*B[k][j]
+
+}
+
+}
+
+}
+
+showMatrix(C)
+
+}
+
+function transpose(){
+
+let A=getMatrix("a")
+
+let n=A.length
+
+let T=[]
+
+for(let i=0;i<n;i++){
+
+T[i]=[]
+
+for(let j=0;j<n;j++){
+
+T[i][j]=A[j][i]
+
+}
+
+}
+
+showMatrix(T)
+
+}
+
+function determinant(){
+
+let A=getMatrix("a")
+
+let n=A.length
+
+let det=1
+
+let M=JSON.parse(JSON.stringify(A))
+
+for(let i=0;i<n;i++){
+
+if(M[i][i]==0){
+
+for(let j=i+1;j<n;j++){
+
+if(M[j][i]!=0){
+
+[M[i],M[j]]=[M[j],M[i]]
+
+det*=-1
+break
+
+}
+
+}
+
+}
+
+det*=M[i][i]
+
+for(let j=i+1;j<n;j++){
+
+let factor=M[j][i]/M[i][i]
+
+for(let k=i;k<n;k++){
+
+M[j][k]-=factor*M[i][k]
+
+}
+
+}
+
+}
+
+document.getElementById("result").innerHTML="Determinant = "+det
+
+}
+
+function inverse(){
+
+let A=getMatrix("a")
+
+let n=A.length
+
+let I=[]
+
+for(let i=0;i<n;i++){
+
+I[i]=[]
+
+for(let j=0;j<n;j++){
+
+I[i][j]=(i==j)?1:0
+
+}
+
+}
+
+for(let i=0;i<n;i++){
+
+let diag=A[i][i]
+
+for(let j=0;j<n;j++){
+
+A[i][j]/=diag
+I[i][j]/=diag
+
+}
+
+for(let k=0;k<n;k++){
+
+if(k!=i){
+
+let factor=A[k][i]
+
+for(let j=0;j<n;j++){
+
+A[k][j]-=factor*A[i][j]
+I[k][j]-=factor*I[i][j]
+
+}
+
+}
+
+}
+
+}
+
+showMatrix(I)
+
+}
+
+createMatrix()
 
 </script>
 
