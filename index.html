@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Matrix Solver</title>
+<style>
+body{
+font-family:Arial;
+text-align:center;
+background:#eef;
+}
+
+input{
+width:50px;
+margin:5px;
+}
+
+button{
+padding:10px;
+margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Matrix Determinant Solver</h1>
+
+<input id="a11">
+<input id="a12"><br>
+
+<input id="a21">
+<input id="a22"><br>
+
+<button onclick="solve()">Solve</button>
+
+<h2 id="result"></h2>
+
+<script>
+
+function solve(){
+
+let a11 = Number(document.getElementById("a11").value);
+let a12 = Number(document.getElementById("a12").value);
+let a21 = Number(document.getElementById("a21").value);
+let a22 = Number(document.getElementById("a22").value);
+
+let det = a11*a22 - a12*a21;
+
+document.getElementById("result").innerHTML =
+"Determinant = " + det;
+
+}
+
+</script>
+
+</body>
+</html>
