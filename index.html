@@ -1,362 +1,276 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html lang="en">
 <head>
-<title>Advanced Matrix Solver</title>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ultimate Matrix Solver</title>
 <style>
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #e9f3ff;
+  text-align: center;
+}h1 { color: #1e6fd9; }
 
-body{
-font-family: Arial;
-background:#f2f2f2;
-text-align:center;
-}
+.container { background: white; padding: 20px; border-radius: 14px; width: 95%; max-width: 850px; margin: auto; box-shadow: 0px 5px 18px rgba(0,0,0,0.12); }
 
-h1{
-color:#333;
-}
+input { width: 55px; height: 38px; text-align: center; margin: 2px; border: 1px solid #9cc8ff; border-radius: 6px; }
 
-.container{
-margin-top:20px;
-}
+button { margin: 6px; padding: 10px 14px; border: none; border-radius: 8px; background: #4da3ff; color: white; font-weight: bold; cursor: pointer; }
 
-input{
-width:50px;
-height:30px;
-text-align:center;
-margin:2px;
-}
+button:hover { background: #1e6fd9; }
 
-button{
-padding:10px;
-margin:5px;
-cursor:pointer;
-}
+.section { margin-top: 10px; }
 
-.matrix{
-margin:10px;
-display:inline-block;
-}
+#result { margin-top: 20px; font-size: 18px; color: #003366; } </style>
 
-#result{
-margin-top:20px;
-font-size:18px;
-font-weight:bold;
-}
-
-</style>
 </head>
+<body><h1>Ultimate Matrix Solver (Engineering Edition)</h1><div class="container">Matrix Size: <input id="size" type="number" value="3" min="2" max="8" /> <button onclick="createMatrix()">Create Matrix</button>
 
-<body>
-
-<h1>Matrix Solver</h1>
-
-Enter Matrix Size (n × n)
-
-<br><br>
-
-<input type="number" id="size" value="2" min="1" max="10">
-
-<button onclick="createMatrix()">Create Matrix</button>
-
-<div class="container">
-
-<div id="matrixA" class="matrix"></div>
-<div id="matrixB" class="matrix"></div>
-
-</div>
-
-<br>
-
-<button onclick="add()">A + B</button>
-<button onclick="subtract()">A - B</button>
-<button onclick="multiply()">A × B</button>
-<button onclick="transpose()">Transpose A</button>
-<button onclick="determinant()">Determinant A</button>
-<button onclick="inverse()">Inverse A</button>
-
-<div id="result"></div>
-
-<script>
+<div id="matrix"></div><div class="section">
+<button onclick="determinant()">Determinant</button>
+<button onclick="inverse()">Inverse</button>
+<button onclick="transpose()">Transpose</button>
+<button onclick="rankMatrix()">Rank</button>
+<button onclick="traceMatrix()">Trace</button>
+<button onclick="identityCheck()">Check Identity</button>
+<button onclick="symmetricCheck()">Check Symmetric</button>
+<button onclick="orthogonalCheck()">Check Orthogonal</button>
+<button onclick="upperTriangularCheck()">Upper Triangular?</button>
+<button onclick="lowerTriangularCheck()">Lower Triangular?</button>
+</div><div class="section">
+<button onclick="gaussianElimination()">Gaussian Elimination</button>
+<button onclick="rowEchelon()">REF</button>
+<button onclick="rref()">RREF</button>
+<button onclick="cofactorMatrix()">Cofactor Matrix</button>
+<button onclick="adjointMatrix()">Adjoint</button>
+</div><div id="result"></div></div><script>
 
 function createMatrix(){
-
-let n = document.getElementById("size").value
-
-let A=""
-let B=""
-
+let n=size.value
+let html=""
 for(let i=0;i<n;i++){
-
 for(let j=0;j<n;j++){
-
-A += `<input id="a${i}${j}" value="0">`
-B += `<input id="b${i}${j}" value="0">`
-
+html+=`<input id="a${i}${j}" value="0">`
+}
+html+="<br>"
+}
+matrix.innerHTML=html
 }
 
-A+="<br>"
-B+="<br>"
-
-}
-
-document.getElementById("matrixA").innerHTML="<h3>Matrix A</h3>"+A
-document.getElementById("matrixB").innerHTML="<h3>Matrix B</h3>"+B
-
-}
-
-function getMatrix(prefix){
-
-let n = document.getElementById("size").value
-
-let m=[]
-
+function getMatrix(){
+let n=size.value
+let M=[]
 for(let i=0;i<n;i++){
-
-m[i]=[]
-
+M[i]=[]
 for(let j=0;j<n;j++){
-
-m[i][j]=Number(document.getElementById(prefix+i+j).value)
-
+M[i][j]=parseFloat(document.getElementById(`a${i}${j}`).value)
+}
+}
+return M
 }
 
+function showMatrix(M){
+let html="<br>"
+for(let row of M){
+html+=row.map(x=>Number(x).toFixed(3)).join("  ")+"<br>"
 }
-
-return m
-
-}
-
-function showMatrix(m){
-
-let text=""
-
-for(let i=0;i<m.length;i++){
-
-for(let j=0;j<m.length;j++){
-
-text+=m[i][j].toFixed(2)+" "
-
-}
-
-text+="<br>"
-
-}
-
-document.getElementById("result").innerHTML=text
-
-}
-
-function add(){
-
-let A=getMatrix("a")
-let B=getMatrix("b")
-
-let n=A.length
-
-let C=[]
-
-for(let i=0;i<n;i++){
-
-C[i]=[]
-
-for(let j=0;j<n;j++){
-
-C[i][j]=A[i][j]+B[i][j]
-
-}
-
-}
-
-showMatrix(C)
-
-}
-
-function subtract(){
-
-let A=getMatrix("a")
-let B=getMatrix("b")
-
-let n=A.length
-
-let C=[]
-
-for(let i=0;i<n;i++){
-
-C[i]=[]
-
-for(let j=0;j<n;j++){
-
-C[i][j]=A[i][j]-B[i][j]
-
-}
-
-}
-
-showMatrix(C)
-
-}
-
-function multiply(){
-
-let A=getMatrix("a")
-let B=getMatrix("b")
-
-let n=A.length
-
-let C=[]
-
-for(let i=0;i<n;i++){
-
-C[i]=[]
-
-for(let j=0;j<n;j++){
-
-C[i][j]=0
-
-for(let k=0;k<n;k++){
-
-C[i][j]+=A[i][k]*B[k][j]
-
-}
-
-}
-
-}
-
-showMatrix(C)
-
-}
-
-function transpose(){
-
-let A=getMatrix("a")
-
-let n=A.length
-
-let T=[]
-
-for(let i=0;i<n;i++){
-
-T[i]=[]
-
-for(let j=0;j<n;j++){
-
-T[i][j]=A[j][i]
-
-}
-
-}
-
-showMatrix(T)
-
+result.innerHTML=html
 }
 
 function determinant(){
-
-let A=getMatrix("a")
-
+let A=getMatrix()
 let n=A.length
-
 let det=1
-
-let M=JSON.parse(JSON.stringify(A))
-
 for(let i=0;i<n;i++){
-
-if(M[i][i]==0){
-
+if(A[i][i]==0){
 for(let j=i+1;j<n;j++){
-
-if(M[j][i]!=0){
-
-[M[i],M[j]]=[M[j],M[i]]
-
+if(A[j][i]!=0){
+[A[i],A[j]]=[A[j],A[i]]
 det*=-1
 break
-
 }
-
 }
-
 }
-
-det*=M[i][i]
-
+if(A[i][i]==0){result.innerHTML="Determinant = 0";return}
 for(let j=i+1;j<n;j++){
-
-let factor=M[j][i]/M[i][i]
-
+let f=A[j][i]/A[i][i]
 for(let k=i;k<n;k++){
-
-M[j][k]-=factor*M[i][k]
-
+A[j][k]-=f*A[i][k]
+}
+}
+det*=A[i][i]
+}
+result.innerHTML="Determinant = "+det.toFixed(3)
 }
 
+function transpose(){
+let A=getMatrix()
+let T=A[0].map((_,i)=>A.map(r=>r[i]))
+showMatrix(T)
 }
 
+function traceMatrix(){
+let A=getMatrix()
+let trace=0
+for(let i=0;i<A.length;i++) trace+=A[i][i]
+result.innerHTML="Trace = "+trace
 }
 
-document.getElementById("result").innerHTML="Determinant = "+det
-
-}
-
-function inverse(){
-
-let A=getMatrix("a")
-
+function identityCheck(){
+let A=getMatrix()
 let n=A.length
-
-let I=[]
-
 for(let i=0;i<n;i++){
-
-I[i]=[]
-
 for(let j=0;j<n;j++){
-
-I[i][j]=(i==j)?1:0
-
+if((i==j && A[i][j]!=1)||(i!=j && A[i][j]!=0)){
+result.innerHTML="Not Identity Matrix";return
+}
+}
+}
+result.innerHTML="Identity Matrix"
 }
 
+function symmetricCheck(){
+let A=getMatrix()
+for(let i=0;i<A.length;i++){
+for(let j=0;j<A.length;j++){
+if(A[i][j]!=A[j][i]){
+result.innerHTML="Not Symmetric";return
+}
+}
+}
+result.innerHTML="Symmetric Matrix"
 }
 
+function orthogonalCheck(){
+let A=getMatrix()
+let AT=A[0].map((_,i)=>A.map(r=>r[i]))
+let n=A.length
+let P=[]
 for(let i=0;i<n;i++){
-
-let diag=A[i][i]
-
+P[i]=[]
 for(let j=0;j<n;j++){
-
-A[i][j]/=diag
-I[i][j]/=diag
-
-}
-
+P[i][j]=0
 for(let k=0;k<n;k++){
-
-if(k!=i){
-
-let factor=A[k][i]
-
+P[i][j]+=A[i][k]*AT[k][j]
+}
+}
+}
+for(let i=0;i<n;i++){
 for(let j=0;j<n;j++){
-
-A[k][j]-=factor*A[i][j]
-I[k][j]-=factor*I[i][j]
-
+if((i==j && Math.abs(P[i][j]-1)>0.01)||(i!=j && Math.abs(P[i][j])>0.01)){
+result.innerHTML="Not Orthogonal";return
+}
+}
+}
+result.innerHTML="Orthogonal Matrix"
 }
 
+function upperTriangularCheck(){
+let A=getMatrix()
+for(let i=1;i<A.length;i++){
+for(let j=0;j<i;j++){
+if(A[i][j]!=0){result.innerHTML="Not Upper Triangular";return}
+}
+}
+result.innerHTML="Upper Triangular Matrix"
 }
 
+function lowerTriangularCheck(){
+let A=getMatrix()
+for(let i=0;i<A.length;i++){
+for(let j=i+1;j<A.length;j++){
+if(A[i][j]!=0){result.innerHTML="Not Lower Triangular";return}
+}
+}
+result.innerHTML="Lower Triangular Matrix"
 }
 
+function gaussianElimination(){
+let A=getMatrix()
+let n=A.length
+for(let i=0;i<n;i++){
+for(let j=i+1;j<n;j++){
+let ratio=A[j][i]/A[i][i]
+for(let k=0;k<n;k++){
+A[j][k]-=ratio*A[i][k]
+}
+}
+}
+showMatrix(A)
 }
 
-showMatrix(I)
+function rowEchelon(){
+let A=getMatrix()
+let lead=0
+for(let r=0;r<A.length;r++){
+if(lead>=A.length) return
+let i=r
+while(A[i][lead]==0){
+i++
+if(i==A.length){i=r;lead++;if(lead==A.length)return}
+}
+[A[i],A[r]]=[A[r],A[i]]
+let val=A[r][lead]
+for(let j=0;j<A.length;j++) A[r][j]/=val
+for(let i=0;i<A.length;i++){
+if(i!=r){
+let val=A[i][lead]
+for(let j=0;j<A.length;j++){
+A[i][j]-=val*A[r][j]
+}
+}
+}
+lead++
+}
+showMatrix(A)
+}
 
+function rref(){ rowEchelon() }
+
+function rankMatrix(){
+let A=getMatrix()
+let rank=A.length
+let n=A.length
+for(let row=0;row<rank;row++){
+if(A[row][row]){
+for(let col=0;col<n;col++){
+if(col!=row){
+let mult=A[col][row]/A[row][row]
+for(let i=0;i<rank;i++){
+A[col][i]-=mult*A[row][i]
+}
+}
+}
+}
+else{
+let reduce=true
+for(let i=row+1;i<n;i++){
+if(A[i][row]){
+[A[row],A[i]]=[A[i],A[row]]
+reduce=false
+break
+}
+}
+if(reduce){
+rank--
+for(let i=0;i<n;i++){
+A[i][row]=A[i][rank]
+}
+}
+row--
+}
+}
+result.innerHTML="Rank = "+rank
+}
+
+function cofactorMatrix(){
+result.innerHTML="Cofactor feature coming next upgrade (minor-based engine required)."
+}
+
+function adjointMatrix(){
+result.innerHTML="Adjoint feature coming next upgrade (depends on cofactor matrix)."
 }
 
 createMatrix()
 
-</script>
-
-</body>
+</script></body>
 </html>
