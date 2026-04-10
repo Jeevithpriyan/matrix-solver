@@ -1,23 +1,23 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html>
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matrix Solver</title><style>
+
+<title>Matrix Solver</title>
+
+<style>
+
 body{
 font-family:Segoe UI;
 background:#eaf4ff;
 text-align:center;
 }
 
-h1{
-color:#1e6fd9;
-}
-
 .container{
 background:white;
 padding:20px;
 width:95%;
-max-width:900px;
+max-width:950px;
 margin:auto;
 border-radius:14px;
 box-shadow:0px 5px 18px rgba(0,0,0,.12);
@@ -47,268 +47,600 @@ button:hover{
 background:#1e6fd9;
 }
 
-.section{
-margin-top:10px;
-}
-
 #result{
 margin-top:20px;
 font-size:18px;
 color:#003366;
 }
 
-.matrixBlock{
-margin-top:15px;
-}
-</style></head><body><h1>Matrix Solver</h1><div class="container">Matrix Size: <input id="size" type="number" value="3" min="2" max="6"> <button onclick="createMatrices()">Create Matrices</button>
+</style>
 
-<div class="matrixBlock">
+</head>
+
+<body>
+
+<h1>Matrix Solver</h1>
+
+<div class="container">
+
+Rows:
+<input id="rows" type="number" value="3" min="1" max="6">
+
+Columns:
+<input id="cols" type="number" value="3" min="1" max="6">
+
+<button onclick="createMatrices()">Create Matrices</button>
+
 <h3>Matrix A</h3>
-<div id="matrixA"></div><h3>Matrix B</h3>
+<div id="matrixA"></div>
+
+<h3>Matrix B</h3>
 <div id="matrixB"></div>
-</div><div class="section">
+
+<br>
+
 <button onclick="addMatrix()">A + B</button>
 <button onclick="subtractMatrix()">A − B</button>
 <button onclick="multiplyMatrix()">A × B</button>
-</div><div class="section">
-<button onclick="determinant()">Determinant(A)</button>
+
+<br>
+
+<button onclick="determinant()">Det(A)</button>
 <button onclick="inverse()">Inverse(A)</button>
 <button onclick="transpose()">Transpose(A)</button>
 <button onclick="traceMatrix()">Trace(A)</button>
 <button onclick="rankMatrix()">Rank(A)</button>
-</div><div class="section">
+
+<br>
+
 <button onclick="identityCheck()">Identity?</button>
 <button onclick="symmetricCheck()">Symmetric?</button>
 <button onclick="orthogonalCheck()">Orthogonal?</button>
 <button onclick="upperTriangularCheck()">Upper Triangular?</button>
 <button onclick="lowerTriangularCheck()">Lower Triangular?</button>
-</div><div class="section">
-<button onclick="gaussianElimination()">Gaussian Elimination</button>
-<button onclick="rowEchelon()">REF</button>
+
+<br>
+
+<button onclick="gaussianElimination()">Gaussian</button>
 <button onclick="rref()">RREF</button>
-</div><div id="result"></div></div><script>
+
+<div id="result"></div>
+
+</div>
+
+<script>
 
 function createMatrices(){
-let n=size.value
+
+let r=rows.value
+let c=cols.value
+
 let html=""
-for(let i=0;i<n;i++){
-for(let j=0;j<n;j++) html+=`<input id=a${i}${j} value=0>`
+
+for(let i=0;i<r;i++){
+for(let j=0;j<c;j++)
+html+=`<input id=a${i}${j} value=0>`
 html+="<br>"
 }
+
 matrixA.innerHTML=html
 
 html=""
-for(let i=0;i<n;i++){
-for(let j=0;j<n;j++) html+=`<input id=b${i}${j} value=0>`
+
+for(let i=0;i<r;i++){
+for(let j=0;j<c;j++)
+html+=`<input id=b${i}${j} value=0>`
 html+="<br>"
 }
+
 matrixB.innerHTML=html
+
 }
 
 function getMatrix(id){
-let n=size.value
+
+let r=rows.value
+let c=cols.value
+
 let M=[]
-for(let i=0;i<n;i++){
+
+for(let i=0;i<r;i++){
+
 M[i]=[]
-for(let j=0;j<n;j++){
+
+for(let j=0;j<c;j++){
+
 M[i][j]=parseFloat(document.getElementById(`${id}${i}${j}`).value)
+
 }
+
 }
+
 return M
+
 }
 
 function showMatrix(M){
+
 let html="<br>"
-for(let row of M) html+=row.map(x=>x.toFixed(3)).join("  ")+"<br>"
+
+for(let row of M)
+
+html+=row.map(x=>x.toFixed(3)).join("   ")+"<br>"
+
 result.innerHTML=html
+
 }
 
 function addMatrix(){
+
 let A=getMatrix("a")
+
 let B=getMatrix("b")
+
 let C=A.map((r,i)=>r.map((v,j)=>v+B[i][j]))
+
 showMatrix(C)
+
 }
 
 function subtractMatrix(){
+
 let A=getMatrix("a")
+
 let B=getMatrix("b")
+
 let C=A.map((r,i)=>r.map((v,j)=>v-B[i][j]))
+
 showMatrix(C)
+
 }
 
 function multiplyMatrix(){
+
 let A=getMatrix("a")
+
 let B=getMatrix("b")
-let n=A.length
+
+let r=A.length
+
+let c=A[0].length
+
+if(c!=B.length){
+
+result.innerHTML="Multiplication not possible"
+
+return
+
+}
+
 let C=[]
-for(let i=0;i<n;i++){
+
+for(let i=0;i<r;i++){
+
 C[i]=[]
-for(let j=0;j<n;j++){
+
+for(let j=0;j<B[0].length;j++){
+
 C[i][j]=0
-for(let k=0;k<n;k++) C[i][j]+=A[i][k]*B[k][j]
+
+for(let k=0;k<c;k++)
+
+C[i][j]+=A[i][k]*B[k][j]
+
 }
+
 }
+
 showMatrix(C)
+
 }
 
 function determinant(){
+
 let A=getMatrix("a")
-let n=A.length
+
+if(A.length!=A[0].length){
+
+result.innerHTML="Square matrix only"
+
+return
+
+}
+
 let det=1
+
+let n=A.length
+
 for(let i=0;i<n;i++){
-if(A[i][i]==0){result.innerHTML="Determinant = 0";return}
+
+if(A[i][i]==0){
+
+result.innerHTML="Determinant = 0"
+
+return
+
+}
+
 for(let j=i+1;j<n;j++){
+
 let f=A[j][i]/A[i][i]
-for(let k=i;k<n;k++) A[j][k]-=f*A[i][k]
+
+for(let k=i;k<n;k++)
+
+A[j][k]-=f*A[i][k]
+
 }
+
 det*=A[i][i]
+
 }
+
 result.innerHTML="Determinant = "+det.toFixed(3)
+
 }
 
 function transpose(){
+
 let A=getMatrix("a")
+
 showMatrix(A[0].map((_,i)=>A.map(r=>r[i])))
+
 }
 
 function traceMatrix(){
+
 let A=getMatrix("a")
+
+if(A.length!=A[0].length){
+
+result.innerHTML="Square matrix only"
+
+return
+
+}
+
 let t=0
-for(let i=0;i<A.length;i++) t+=A[i][i]
+
+for(let i=0;i<A.length;i++)
+
+t+=A[i][i]
+
 result.innerHTML="Trace = "+t
+
+}
+
+function rankMatrix(){
+
+let A=getMatrix("a")
+
+let rank=A.length
+
+let row=A.length
+
+let col=A[0].length
+
+for(let r=0;r<rank;r++){
+
+if(A[r][r]){
+
+for(let c=0;c<row;c++){
+
+if(c!=r){
+
+let mult=A[c][r]/A[r][r]
+
+for(let i=0;i<rank;i++)
+
+A[c][i]-=mult*A[r][i]
+
+}
+
+}
+
+}
+
+else{
+
+let reduce=true
+
+for(let i=r+1;i<row;i++){
+
+if(A[i][r]){
+
+[A[r],A[i]]=[A[i],A[r]]
+
+reduce=false
+
+break
+
+}
+
+}
+
+if(reduce){
+
+rank--
+
+for(let i=0;i<row;i++)
+
+A[i][r]=A[i][rank]
+
+}
+
+r--
+
+}
+
+}
+
+result.innerHTML="Rank = "+rank
+
 }
 
 function identityCheck(){
+
 let A=getMatrix("a")
+
+if(A.length!=A[0].length){
+
+result.innerHTML="Square matrix only"
+
+return
+
+}
+
 for(let i=0;i<A.length;i++){
+
 for(let j=0;j<A.length;j++){
+
 if((i==j&&A[i][j]!=1)||(i!=j&&A[i][j]!=0)){
-result.innerHTML="Not Identity Matrix";return
+
+result.innerHTML="Not Identity Matrix"
+
+return
+
 }
+
 }
+
 }
+
 result.innerHTML="Identity Matrix"
+
 }
 
 function symmetricCheck(){
+
 let A=getMatrix("a")
+
+if(A.length!=A[0].length){
+
+result.innerHTML="Square matrix only"
+
+return
+
+}
+
 for(let i=0;i<A.length;i++){
+
 for(let j=0;j<A.length;j++){
-if(A[i][j]!=A[j][i]){result.innerHTML="Not Symmetric";return}
+
+if(A[i][j]!=A[j][i]){
+
+result.innerHTML="Not Symmetric Matrix"
+
+return
+
 }
+
 }
+
+}
+
 result.innerHTML="Symmetric Matrix"
+
 }
 
 function orthogonalCheck(){
+
 let A=getMatrix("a")
+
+if(A.length!=A[0].length){
+
+result.innerHTML="Square matrix only"
+
+return
+
+}
+
 let AT=A[0].map((_,i)=>A.map(r=>r[i]))
+
 let n=A.length
-let P=[]
+
 for(let i=0;i<n;i++){
-P[i]=[]
+
 for(let j=0;j<n;j++){
-P[i][j]=0
-for(let k=0;k<n;k++) P[i][j]+=A[i][k]*AT[k][j]
+
+let sum=0
+
+for(let k=0;k<n;k++)
+
+sum+=A[i][k]*AT[k][j]
+
+if((i==j&&Math.abs(sum-1)>0.01)||(i!=j&&Math.abs(sum)>0.01)){
+
+result.innerHTML="Not Orthogonal Matrix"
+
+return
+
 }
+
 }
-for(let i=0;i<n;i++){
-for(let j=0;j<n;j++){
-if((i==j&&Math.abs(P[i][j]-1)>0.01)||(i!=j&&Math.abs(P[i][j])>0.01)){
-result.innerHTML="Not Orthogonal";return
+
 }
-}
-}
+
 result.innerHTML="Orthogonal Matrix"
+
 }
 
 function upperTriangularCheck(){
+
 let A=getMatrix("a")
+
+if(A.length!=A[0].length){
+
+result.innerHTML="Square matrix only"
+
+return
+
+}
+
 for(let i=1;i<A.length;i++){
+
 for(let j=0;j<i;j++){
-if(A[i][j]!=0){result.innerHTML="Not Upper Triangular";return}
+
+if(A[i][j]!=0){
+
+result.innerHTML="Not Upper Triangular"
+
+return
+
 }
+
 }
+
+}
+
 result.innerHTML="Upper Triangular Matrix"
+
 }
 
 function lowerTriangularCheck(){
+
 let A=getMatrix("a")
+
+if(A.length!=A[0].length){
+
+result.innerHTML="Square matrix only"
+
+return
+
+}
+
 for(let i=0;i<A.length;i++){
+
 for(let j=i+1;j<A.length;j++){
-if(A[i][j]!=0){result.innerHTML="Not Lower Triangular";return}
+
+if(A[i][j]!=0){
+
+result.innerHTML="Not Lower Triangular"
+
+return
+
 }
+
 }
+
+}
+
 result.innerHTML="Lower Triangular Matrix"
+
 }
 
 function gaussianElimination(){
+
 let A=getMatrix("a")
+
 let n=A.length
+
 for(let i=0;i<n;i++){
+
 for(let j=i+1;j<n;j++){
+
 let r=A[j][i]/A[i][i]
-for(let k=0;k<n;k++) A[j][k]-=r*A[i][k]
-}
-}
-showMatrix(A)
+
+for(let k=0;k<A[0].length;k++)
+
+A[j][k]-=r*A[i][k]
+
 }
 
-function rowEchelon(){ gaussianElimination() }
+}
+
+showMatrix(A)
+
+}
 
 function rref(){
+
 let A=getMatrix("a")
+
 let lead=0
-for(let r=0;r<A.length;r++){
-if(lead>=A.length) return
+
+let rowCount=A.length
+
+let colCount=A[0].length
+
+for(let r=0;r<rowCount;r++){
+
+if(colCount<=lead)
+
+break
+
 let i=r
+
 while(A[i][lead]==0){
+
 i++
-if(i==A.length){i=r;lead++;if(lead==A.length)return}
-}
-[A[i],A[r]]=[A[r],A[i]]
-let val=A[r][lead]
-for(let j=0;j<A.length;j++) A[r][j]/=val
-for(let i=0;i<A.length;i++){
-if(i!=r){
-let val=A[i][lead]
-for(let j=0;j<A.length;j++) A[i][j]-=val*A[r][j]
-}
-}
+
+if(rowCount==i){
+
+i=r
+
 lead++
+
+if(colCount==lead)
+
+break
+
 }
+
+}
+
+[A[i],A[r]]=[A[r],A[i]]
+
+let val=A[r][lead]
+
+for(let j=0;j<colCount;j++)
+
+A[r][j]/=val
+
+for(let i=0;i<rowCount;i++){
+
+if(i!=r){
+
+val=A[i][lead]
+
+for(let j=0;j<colCount;j++)
+
+A[i][j]-=val*A[r][j]
+
+}
+
+}
+
+lead++
+
+}
+
 showMatrix(A)
-}
 
-function inverse(){
-let A=getMatrix("a")
-let n=A.length
-let I=[]
-for(let i=0;i<n;i++){
-I[i]=[]
-for(let j=0;j<n;j++) I[i][j]=(i==j)?1:0
-}
-
-for(let i=0;i<n;i++){
-let diag=A[i][i]
-if(diag==0){result.innerHTML="Inverse not possible";return}
-for(let j=0;j<n;j++){A[i][j]/=diag;I[i][j]/=diag}
-
-for(let k=0;k<n;k++){
-if(k!=i){
-let f=A[k][i]
-for(let j=0;j<n;j++){
-A[k][j]-=f*A[i][j]
-I[k][j]-=f*I[i][j]
-}
-}
-}
-}
-showMatrix(I)
 }
 
 createMatrices()
 
-</script></body>
+</script>
+
+</body>
 </html>
